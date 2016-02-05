@@ -142,6 +142,20 @@ class WDS_CMB2_Time_Range_Field {
 
 		printf( '<input%s value=%s />', $field_type->concat_attrs( $b, array( 'desc' ) ), json_encode( $escaped_value['end'] ) );
 		printf( '</p>' );
+
+		$c = $field_type->parse_args( array(), 'input', array(
+			'type'  => 'checkbox',
+			'class' => 'closed',
+			'name'  => $field_type->_name() . '[closed]',
+			'id'    => $field_type->_id() . '[closed]',
+			'desc'  => $field_type->_desc( true )
+		) );
+		if ($escaped_value['closed'] === "on") {
+			printf( '<br/><div class="cmb-th"><label for="' . $field_type->_id() . '[closed]">Closed?</label></div><input%s checked=checked />', $field_type->concat_attrs( $c, array( 'desc' ) ) );
+		}
+		else {
+			printf( '<br/><div class="cmb-th"><label for="' . $field_type->_id() . '[closed]">Closed?</label></div><input%s />', $field_type->concat_attrs( $c, array( 'desc' ) ) );
+		}
 	}
 
 	/**
