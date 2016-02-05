@@ -109,39 +109,38 @@ class WDS_CMB2_Time_Range_Field {
 	 * @param mixed  $escaped_value The value after being escaped, by default, with sanitize_text_field.
 	 */
 	function render( $field, $escaped_value, $field_object_id, $field_object_type, $field_type ) {
-
 		wp_enqueue_style( 'jquery-timepicker', $this->url . '/assets/jquery-timepicker/jquery.timepicker.css', array(), '0.4.0' );
 		wp_register_script( 'datepair', $this->url . '/assets/jquery-timepicker/Datepair.js', array('jquery'), '0.4.0' );
 		wp_register_script( 'jquery-datepair', $this->url . '/assets/jquery-timepicker/jquery.datepair.js', array('jquery'), '0.4.0' );
 		wp_register_script( 'jquery-timepicker', $this->url . '/assets/jquery-timepicker/jquery.timepicker.js', array( 'jquery', 'datepair', 'jquery-datepair'), '0.4.0' );
-		wp_enqueue_script( 'cmb2-timerange-picker', $this->url . '/assets/cmb2-timerange-picker.js', array( 'jquery', 'datepair', 'jquery-datepair', 'jquery-timepicker' ), self::VERSION, true );
+		wp_enqueue_script( 'cmb2-timerange-picker', $this->url . '/assets/cmb2-timerange-picker.js', array( 'jquery-timepicker' ), self::VERSION, true );
 		// CMB2_Types::parse_args allows arbitrary attributes to be added
-		printf( '<p id="date' . $field_type->_id() . '" class="cmb2-element">' );
+		printf( '<p style="font-size: 0;" id="date' . $field_type->_id() . '" class="cmb2-element">' );
 		$a = $field_type->parse_args( array(), 'input', array(
 			'type'  => 'text',
 			'class' => 'time start',
-			'name'  => $field_type->_name() . '-start',
-			'id'    => $field_type->_id(),
+			'name'  => $field_type->_name() . '[start]',
+			'id'    => $field_type->_id() . '[start]',
 			'desc'  => $field_type->_desc( true ),
 			'data-timerange' => json_encode( array(
-				'id' => '#' . $field_type->_id()
+				'id' => '#' . $field_type->_id() . '[start]'
 			) ),
 		) );
-		printf( '<input%s />', $field_type->concat_attrs( $a, array( 'desc' ) ) );
+		printf( '<input%s value=%s />', $field_type->concat_attrs( $a, array( 'desc' ) ), json_encode( $escaped_value['start'] ) );
 
 
 		$b = $field_type->parse_args( array(), 'input', array(
 			'type'  => 'text',
 			'class' => 'time end',
-			'name'  => $field_type->_name() . '-end',
-			'id'    => $field_type->_id(),
+			'name'  => $field_type->_name() . '[end]',
+			'id'    => $field_type->_id() . '[end]',
 			'desc'  => $field_type->_desc( true ),
 			'data-timerange' => json_encode( array(
-				'id' => '#' . $field_type->_id()
+				'id' => '#' . $field_type->_id() . '[end]'
 			) ),
 		) );
 
-		printf( '<input%s />', $field_type->concat_attrs( $b, array( 'desc' ) ) );
+		printf( '<input%s value=%s />', $field_type->concat_attrs( $b, array( 'desc' ) ), json_encode( $escaped_value['end'] ) );
 		printf( '</p>' );
 	}
 
@@ -161,7 +160,6 @@ class WDS_CMB2_Time_Range_Field {
 		} else {
 			sanitize_text_field( $value );
 		}
-
 		return $value;
 
 	}

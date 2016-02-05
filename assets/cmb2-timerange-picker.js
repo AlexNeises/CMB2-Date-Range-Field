@@ -11,13 +11,11 @@ window.cmb2DateRange = window.cmb2DateRange || {};
 
 			var $this = $( this );
 			var data = $this.data( 'daterange' );
-			$('#' + $this.attr('id') + '.time').timepicker({
+			$('#' + $this.parent().attr('id') + ' > .time').timepicker({
 				'showDuration': true,
 				'timeFormat': 'g:i A'
 			});
-			
-			console.log('#date' + $this.attr('id'));
-			$('#date' + $this.attr('id')).datepair();
+			$('#' + $this.parent().attr('id')).datepair();
 
 			$body.trigger( 'cmb2_timerange_init', { '$el' : $this } );
 		});
