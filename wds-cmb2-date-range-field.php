@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: CMB2 Date Range Field
+ * Plugin Name: CMB2 Time Range Field
  * Plugin URI:  http://webdevstudios.com
- * Description: Adds a date range field to CMB2
+ * Description: Adds a time range field to CMB2
  * Version:     0.1.1
  * Author:      WebDevStudios
  * Author URI:  http://webdevstudios.com
@@ -34,7 +34,7 @@
 /**
  * Main initiation class
  */
-class WDS_CMB2_Date_Range_Field {
+class WDS_CMB2_Time_Range_Field {
 
 	const VERSION = '0.1.1';
 
@@ -76,8 +76,8 @@ class WDS_CMB2_Date_Range_Field {
 		register_deactivation_hook( __FILE__, array( $this, '_deactivate' ) );
 
 		add_action( 'init', array( $this, 'init' ) );
-		add_action( 'cmb2_render_date_range', array( $this, 'render' ), 10, 5 );
-		add_filter( 'cmb2_sanitize_date_range', array( $this, 'sanitize' ), 10, 2 );
+		add_action( 'cmb2_render_time_range', array( $this, 'render' ), 10, 5 );
+		add_filter( 'cmb2_sanitize_time_range', array( $this, 'sanitize' ), 10, 2 );
 	}
 
 	/**
@@ -99,7 +99,7 @@ class WDS_CMB2_Date_Range_Field {
 	 * @return null
 	 */
 	public function init() {
-		load_plugin_textdomain( 'wds-cmb2-date-range-field', false, dirname( $this->basename ) . '/languages/' );
+		load_plugin_textdomain( 'wds-cmb2-time-range-field', false, dirname( $this->basename ) . '/languages/' );
 	}
 
 	/**
@@ -110,26 +110,39 @@ class WDS_CMB2_Date_Range_Field {
 	 */
 	function render( $field, $escaped_value, $field_object_id, $field_object_type, $field_type ) {
 
-		wp_enqueue_style( 'jquery-ui-daterangepicker', $this->url . '/assets/jquery-ui-daterangepicker/jquery.comiseo.daterangepicker.css', array(), '0.4.0' );
-		wp_register_script( 'moment', $this->url . '/assets/moment.min.js', array(), '2.10.3' );
-		wp_register_script( 'jquery-ui-daterangepicker', $this->url . '/assets/jquery-ui-daterangepicker/jquery.comiseo.daterangepicker.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-button', 'jquery-ui-menu', 'jquery-ui-datepicker', 'moment' ), '0.4.0' );
-		wp_enqueue_script( 'cmb2-daterange-picker', $this->url . '/assets/cmb2-daterange-picker.js', array( 'jquery-ui-daterangepicker' ), self::VERSION, true );
-
+		wp_enqueue_style( 'jquery-timepicker', $this->url . '/assets/jquery-timepicker/jquery.timepicker.css', array(), '0.4.0' );
+		wp_register_script( 'datepair', $this->url . '/assets/jquery-timepicker/Datepair.js', array('jquery'), '0.4.0' );
+		wp_register_script( 'jquery-datepair', $this->url . '/assets/jquery-timepicker/jquery.datepair.js', array('jquery'), '0.4.0' );
+		wp_register_script( 'jquery-timepicker', $this->url . '/assets/jquery-timepicker/jquery.timepicker.js', array( 'jquery', 'datepair', 'jquery-datepair'), '0.4.0' );
+		wp_enqueue_script( 'cmb2-timerange-picker', $this->url . '/assets/cmb2-timerange-picker.js', array( 'jquery', 'datepair', 'jquery-datepair', 'jquery-timepicker' ), self::VERSION, true );
 		// CMB2_Types::parse_args allows arbitrary attributes to be added
+		printf( '<p id="date' . $field_type->_id() . '" class="cmb2-element">' );
 		$a = $field_type->parse_args( array(), 'input', array(
 			'type'  => 'text',
-			'class' => 'date-range button-secondary',
-			'name'  => $field_type->_name(),
+			'class' => 'time start',
+			'name'  => $field_type->_name() . '-start',
 			'id'    => $field_type->_id(),
 			'desc'  => $field_type->_desc( true ),
-			'data-daterange' => json_encode( array(
-				'id' => '#' . $field_type->_id(),
-				'buttontext' => esc_attr( $field_type->_text( 'button_text', __( 'Select date range...' ) ) ),
-				'format' => $field->args( 'date_format' ) ? $field->args( 'date_format' ) : 'mm/dd/yy',
+			'data-timerange' => json_encode( array(
+				'id' => '#' . $field_type->_id()
+			) ),
+		) );
+		printf( '<input%s />', $field_type->concat_attrs( $a, array( 'desc' ) ) );
+
+
+		$b = $field_type->parse_args( array(), 'input', array(
+			'type'  => 'text',
+			'class' => 'time end',
+			'name'  => $field_type->_name() . '-end',
+			'id'    => $field_type->_id(),
+			'desc'  => $field_type->_desc( true ),
+			'data-timerange' => json_encode( array(
+				'id' => '#' . $field_type->_id()
 			) ),
 		) );
 
-		printf( '<div class="cmb2-element"><input%s value=\'%s\'/></div>%s', $field_type->concat_attrs( $a, array( 'desc' ) ), json_encode( $escaped_value ), $a['desc'] );
+		printf( '<input%s />', $field_type->concat_attrs( $b, array( 'desc' ) ) );
+		printf( '</p>' );
 	}
 
 	/**
@@ -158,9 +171,9 @@ class WDS_CMB2_Date_Range_Field {
  * Grab the WDS_CMB2_Date_Range_Field object and return it.
  * Wrapper for WDS_CMB2_Date_Range_Field::get_instance()
  */
-function wds_cmb2_date_range_field() {
-	return WDS_CMB2_Date_Range_Field::get_instance();
+function wds_cmb2_time_range_field() {
+	return WDS_CMB2_Time_Range_Field::get_instance();
 }
 
 // Kick it off
-add_action( 'plugins_loaded', 'wds_cmb2_date_range_field' );
+add_action( 'plugins_loaded', 'wds_cmb2_time_range_field' );
